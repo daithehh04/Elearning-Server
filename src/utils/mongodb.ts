@@ -1,18 +1,12 @@
-import mongoose from "mongoose";
-import dotenv from "./dotenv";
-import logger from "./logger";
+import mongoose from "mongoose"
+import dotenv from "./dotenv"
+import logger from "./logger"
 
-dotenv.config();
+dotenv.config()
 
-const {
-  DB_HOST = "127.0.0.1",
-  DB_PORT = "27017",
-  DB_USER = "cluster0",
-  DB_PWD = "the123456",
-  DB_NAME = "my_db",
-} = process.env;
+const { DB_NAME = "my_db" } = process.env
 
-const DB_URL = `mongodb+srv://daithehh04:the123456@cluster0.yfad8mm.mongodb.net/`;
+const DB_URL = `mongodb+srv://daithehh04:the123456@cluster0.yfad8mm.mongodb.net/`
 
 const connectDatabase = (callback?: () => void) => {
   mongoose
@@ -24,14 +18,14 @@ const connectDatabase = (callback?: () => void) => {
         url: DB_URL,
         dbName: DB_NAME,
         // dbHost:DB_HOST
-      });
-      if (callback) callback();
+      })
+      if (callback) callback()
     })
-    .catch((err) => logger.error("MongoDB initial connection error: ", err));
+    .catch((err) => logger.error("MongoDB initial connection error: ", err))
 
   mongoose.connection.on("error", (err) => {
-    console.log("MongoDB error: ", err);
-  });
-};
+    console.log("MongoDB error: ", err)
+  })
+}
 
-export default connectDatabase;
+export default connectDatabase
