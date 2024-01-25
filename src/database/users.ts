@@ -1,10 +1,10 @@
-import mongoose, { Document, Model, model, Types } from "mongoose";
+import mongoose, { Document, Model, model, Types } from "mongoose"
 // import { departmentTable } from "./departments";
-import { UserInfo } from "../submodule/models/user";
-export const userTableName = "User";
+import { UserInfo } from "../submodule/models/user"
+export const userTableName = "User"
 interface IUserSchema extends Model<UserInfoDoc> {}
 export interface UserInfoDoc extends UserInfo, Document {
-  _id: string;
+  _id: string
 }
 
 const UserSchema = new mongoose.Schema<UserInfoDoc, IUserSchema>(
@@ -21,6 +21,8 @@ const UserSchema = new mongoose.Schema<UserInfoDoc, IUserSchema>(
           type: mongoose.Types.ObjectId,
           ref: "Topic",
         },
+        nameExam: String,
+        date: Date,
         status: Number,
         timeStudy: Number,
         score: Number,
@@ -49,6 +51,6 @@ const UserSchema = new mongoose.Schema<UserInfoDoc, IUserSchema>(
     versionKey: false,
     timestamps: true,
   }
-);
+)
 
-export const UserModel = model(userTableName, UserSchema);
+export const UserModel = model(userTableName, UserSchema)
