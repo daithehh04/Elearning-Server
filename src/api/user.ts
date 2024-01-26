@@ -12,7 +12,19 @@ const userService = new UserService()
 userRouter.post(
   Endpoint.UPDATE_USER,
   asyncHandler(async (req, res) => {
-    const body: { token: string; userInfo: UserInfo } = req.body
+    const body: {
+      token: string
+      userInfo: UserInfo
+      isAuth: boolean
+      id?: any
+    } = req.body
+    if (body.isAuth) {
+      const { status, userInfo } = await userService.updateUserInfoV2(body)
+      return res.json({
+        status,
+        userInfo,
+      })
+    }
 
     if (!body.token) {
       throw res.json(new BadRequestError("invalid info"))
@@ -26,7 +38,7 @@ userRouter.post(
   })
 )
 
-userRouter.post(
+userRouter.get(
   Endpoint.GET_ALL_USER,
   asyncHandler(async (req, res) => {
     const users = await userService.getAllUser()

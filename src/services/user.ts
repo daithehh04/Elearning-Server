@@ -56,6 +56,36 @@ export default class UserService {
       }
     }
   }
+  updateUserInfoV2 = async (body: {
+    id?: any
+    userInfo: UserInfo
+  }): Promise<{
+    status: number
+    userInfo: UserInfo | null
+  }> => {
+    let userInfo = new UserInfo(body.userInfo)
+    let status = TTCSconfig.STATUS_SUCCESS
+
+    try {
+      // const findUser = await UserModel.findOne({ _id: body.userInfo._id });
+      const userUpdate = await UserModel.findOneAndUpdate(
+        { _id: body.id },
+        { $set: { ...body.userInfo } },
+        { new: true }
+      )
+      userInfo = new UserInfo(userUpdate)
+
+      return {
+        status,
+        userInfo,
+      }
+    } catch (err) {
+      return {
+        status: TTCSconfig.STATUS_FAIL,
+        userInfo: null,
+      }
+    }
+  }
 
   checkUserFromToken = async (
     token: string

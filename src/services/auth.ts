@@ -1,60 +1,64 @@
-import TTCSconfig from "../submodule/common/config";
-import { UserInfo } from "../submodule/models/user";
-import { UserModel } from "../database/users";
-import { decrypt, encodeSHA256Pass, encrypt } from "../submodule/utils/crypto";
-import { jwtDecodeToken, jwtEncode } from "../utils/jwtToken";
-import moment from "moment";
+import TTCSconfig from "../submodule/common/config"
+import { UserInfo } from "../submodule/models/user"
+import { UserModel } from "../database/users"
+import { decrypt, encodeSHA256Pass, encrypt } from "../submodule/utils/crypto"
+import { jwtDecodeToken, jwtEncode } from "../utils/jwtToken"
+import moment from "moment"
 
 class AuthServices {
-  private processPass(userObject: { account: string; password: string }) {
-    const decryptedResult = decrypt(userObject.password);
+  private processPass(userObject: { account: string; password: any }) {
+    const decryptedResult = decrypt(userObject.password)
+    console.log("decryptedResult::", decryptedResult)
     const encodedPassword = encodeSHA256Pass(
       userObject.account,
       decryptedResult
-    );
-    return encodedPassword;
+    )
+    console.log("encodedPassword::", encodedPassword)
+
+    return encodedPassword
   }
   login = async (body: {
-    account: string;
-    password: string;
-    userRole?: number;
+    account: string
+    password: string
+    userRole?: number
   }): Promise<UserInfo> => {
-    const passEncode = this.processPass(body);
-    let userInfo = new UserInfo({ ...body, password: body.password });
+    const passEncode = this.processPass(body)
+    let userInfo = new UserInfo({ ...body, password: body.password })
     try {
       const checkUserAcc: UserInfo | null = await UserModel.findOne(
         typeof body.userRole === "number"
           ? { account: userInfo.account, userRole: body.userRole }
           : { account: userInfo.account }
-      );
+      )
+
       if (checkUserAcc) {
         if (passEncode === checkUserAcc.password) {
-          userInfo = new UserInfo(checkUserAcc);
-          userInfo.loginCode = TTCSconfig.LOGIN_SUCCESS;
-          userInfo.token = jwtEncode(userInfo?._id, 60 * 60 * 24 * 30);
+          userInfo = new UserInfo(checkUserAcc)
+          userInfo.loginCode = TTCSconfig.LOGIN_SUCCESS
+          userInfo.token = jwtEncode(userInfo?._id, 60 * 60 * 24 * 30)
           // update lastLogin
         } else {
-          userInfo.loginCode = TTCSconfig.LOGIN_WRONG_PASSWORD;
+          userInfo.loginCode = TTCSconfig.LOGIN_WRONG_PASSWORD
         }
       } else {
-        userInfo.loginCode = TTCSconfig.LOGIN_ACCOUNT_NOT_EXIST;
+        userInfo.loginCode = TTCSconfig.LOGIN_ACCOUNT_NOT_EXIST
       }
-      return userInfo;
+      return userInfo
     } catch (error) {
-      userInfo.loginCode = TTCSconfig.LOGIN_FAILED;
-      return userInfo;
+      userInfo.loginCode = TTCSconfig.LOGIN_FAILED
+      return userInfo
     }
-  };
+  }
   register = async (body: UserInfo): Promise<any> => {
-    let userInfo = new UserInfo(body);
+    let userInfo = new UserInfo(body)
     try {
-      const account = userInfo.account?.trim().toLowerCase();
-      const password = userInfo.password;
+      const account = userInfo.account?.trim().toLowerCase()
+      const password = userInfo.password
       const checkUserAcc: UserInfo | null = await UserModel.findOne({
         account,
-      });
+      })
       if (!checkUserAcc) {
-        const passEncode = this.processPass({ account, password: "" });
+        const passEncode = this.processPass({ account, password })
 
         // luu vao db
         const newUserInfo = {
@@ -63,21 +67,21 @@ class AuthServices {
           registerDate: Date.now(),
           status: TTCSconfig.UserStatus.NORMAL,
           lastLogin: Date.now(),
-        };
-        const newUser = await UserModel.create(newUserInfo);
-        const token = jwtEncode(newUser?._id, 2592000);
+        }
+        const newUser = await UserModel.create(newUserInfo)
+        const token = jwtEncode(newUser?._id, 2592000)
         return {
           ...newUserInfo,
           _id: newUser._id,
           loginCode: TTCSconfig.LOGIN_SUCCESS,
           token,
-        };
+        }
       }
-      return { ...userInfo, loginCode: TTCSconfig.LOGIN_ACCOUNT_IS_USED };
+      return { ...userInfo, loginCode: TTCSconfig.LOGIN_ACCOUNT_IS_USED }
     } catch (err) {
-      userInfo.loginCode = TTCSconfig.LOGIN_FAILED;
+      userInfo.loginCode = TTCSconfig.LOGIN_FAILED
     }
-  };
+  }
   // logout =async (token:string) => {
   //     const tokenData = jwtDecodeToken(token);
   //     if (!!token && typeof tokenData !== "string") {
@@ -91,21 +95,21 @@ class AuthServices {
 
   logout = async (body: { idUser: string }) => {
     try {
-      const user = await UserModel.findOne({ _id: body.idUser });
-      let status = TTCSconfig.STATUS_FAIL;
+      const user = await UserModel.findOne({ _id: body.idUser })
+      let status = TTCSconfig.STATUS_FAIL
       if (user) {
-        const userInfo = new UserInfo(user);
+        const userInfo = new UserInfo(user)
         const res = await UserModel.findOneAndUpdate(
           { _id: body.idUser },
           { $set: { lastLogin: moment().valueOf() } },
           { new: true }
-        );
-        return { status: TTCSconfig.STATUS_SUCCESS };
+        )
+        return { status: TTCSconfig.STATUS_SUCCESS }
       }
-      return { status };
+      return { status }
     } catch (error) {
-      return { status: TTCSconfig.STATUS_FAIL };
+      return { status: TTCSconfig.STATUS_FAIL }
     }
-  };
+  }
 }
-export { AuthServices };
+export { AuthServices }
