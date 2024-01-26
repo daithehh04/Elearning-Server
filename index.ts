@@ -46,9 +46,9 @@ class App {
   private useAPI() {
     console.log("hello")
     // Web
-    this.app.get("/api", (req, res) => {
+    this.app.get("/", (req, res) => {
       res.json({
-        message: "Connected!",
+        message: "Hi! Welcome to api learning",
       })
     })
     this.app.use(PREFIX_API, webRouters)
