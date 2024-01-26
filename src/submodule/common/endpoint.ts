@@ -64,7 +64,7 @@ export default class ENDPONTAPI {
   static CREATE_FEEDBACK = "/createFeedback";
   static DELETE_FEEDBACK = "/deleteFeedback";
   static GET_FEEDBACKS_BY_TYPE_OR_COURSE = "/loadFeedbacksByTypeOrCourse";
-
+  static FeedbackEmail = "/feedbackEmail";
   // statistic
   static LOAD_STATISTIC = "/loadStatistic";
 }

@@ -3,6 +3,7 @@ import FeedbackService from "../services/feedback";
 import asyncHandler from "../utils/async_handle";
 import ENDPONTAPI from "../submodule/common/endpoint";
 import TTCSconfig from "../submodule/common/config";
+import { sendMail } from "../../utils/email";
 
 const feedbackRouter = express.Router();
 const feedbackService = new FeedbackService();
@@ -66,6 +67,15 @@ feedbackRouter.post(
       data,
       status: TTCSconfig.STATUS_SUCCESS,
     });
+  })
+);
+feedbackRouter.post(
+  ENDPONTAPI.FeedbackEmail,
+  asyncHandler(async (req, res) => {
+    const { email, subject, message } = req.body;
+    console.log(email, subject, message);
+    const result = await sendMail(email, subject, message);
+    return res.json(result);
   })
 );
 
