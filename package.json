@@ -16,7 +16,7 @@
     "pull-submodule": "cd src/submodule && git pull origin master && npm i",
     "deploy": "vercel deploy --prod"
   },
-  "author": "",
+  "author": "dai the",
   "license": "ISC",
   "dependencies": {
     "@types/jsonwebtoken": "^8.5.9",
